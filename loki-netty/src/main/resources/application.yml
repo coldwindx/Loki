@@ -1,0 +1,6 @@
+spring.application.name: loki-netty
+
+# netty
+netty.server.host: 127.0.0.1
+netty.server.port: 9091
+netty.server.use-epoll: false  # 传输模式在linux性能更高
