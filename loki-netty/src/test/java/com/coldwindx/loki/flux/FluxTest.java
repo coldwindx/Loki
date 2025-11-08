@@ -1,0 +1,27 @@
+package com.coldwindx.loki.flux;
+
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+
+@Slf4j
+public class FluxTest {
+
+    @Test
+    public void test() throws InterruptedException {
+        Flux<Integer> flux = Flux.range(1, 100)
+                .concatMap(integer -> {
+                    return Mono.fromCallable(() -> {
+                        Thread.sleep(1000);
+                        System.out.println("val:" + integer + ", thread:" + Thread.currentThread().getId());
+
+                        return integer;
+                    }).publishOn(Schedulers.parallel()); // <- Each Mono processing every integer can be processed in a different thread
+                })
+                .doOnError(e->log.error(e.getMessage()));
+        flux.subscribe();
+        Thread.sleep(1000000);
+    }
+}
