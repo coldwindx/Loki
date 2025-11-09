@@ -6,6 +6,9 @@ import org.springframework.context.annotation.Configuration;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+/**
+ * 线程池集合
+ */
 @Configuration
 public class AsyncConfig {
 
