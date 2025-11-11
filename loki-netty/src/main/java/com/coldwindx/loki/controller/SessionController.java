@@ -18,4 +18,10 @@ public class SessionController {
         Optional.ofNullable(sender.get(id)).ifPresent(s -> s.send(data));
         return "Success";
     }
+
+    @PostMapping(value = "complete")
+    public String complete(@RequestParam String id) {
+        Optional.ofNullable(sender.get(id)).ifPresent(WsSenderStore.Sender::complete);
+        return "Success";
+    }
 }
