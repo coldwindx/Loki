@@ -1,8 +1,7 @@
 package com.coldwindx.loki.endpoint;
 
 import com.coldwindx.loki.store.WsSenderStore;
-import com.coldwindx.loki.utils.AsyncHelper;
-import com.coldwindx.loki.store.WebSockSessionStore;
+import com.coldwindx.loki.store.WebSockSessionHolder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +17,10 @@ import reactor.core.publisher.Mono;
 public class ChatEndpoint implements WebSocketHandler {
 
     @Autowired
-    private WebSockSessionStore store;
+    private WebSockSessionHolder store;
 
     @Autowired
     private WsSenderStore senders;
-
-    @Autowired
-    private AsyncHelper async;
 
     @Override
     public Mono<Void> handle(@NonNull WebSocketSession session) {
@@ -38,29 +34,6 @@ public class ChatEndpoint implements WebSocketHandler {
                 .then();
         Mono<Void> output = session.send(Flux.create(sink->senders.put(session.getId(), new WsSenderStore.Sender(session, sink))));
         return Flux.zip(input, output).then();
-        //        Flux<WebSocketMessage> output = session.receive()
-//                .flatMap(msg->distribute(session, msg))
-//                .subscribeOn(Schedulers.parallel());
-//        return session.send(output);
-    }
-
-
-    private Flux<WebSocketMessage> distribute(WebSocketSession session, WebSocketMessage message) {
-        log.info("[{}] >>> distribute message: {}", Thread.currentThread().threadId(), message);
-        if(message.getType() == WebSocketMessage.Type.TEXT){
-            String msg = message.getPayloadAsText();
-            async.submit(()->{
-                try {
-                    Thread.sleep(1000);
-                    return "hi: " + msg;
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }).thenAccept((res)->{
-                session.send(Mono.just(session.textMessage(res))).subscribe();
-            });
-        }
-        return Flux.empty();
     }
 }
 

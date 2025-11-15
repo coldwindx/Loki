@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 
 @Configuration
-public class NettyConfig {
+public class ChatEndpointConfig {
 
     @Autowired
     private ChatEndpoint endpoint;

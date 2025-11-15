@@ -10,14 +10,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * 本地会话存储，线程安全
  */
 @Component
-public class WebSockSessionStore {
-    private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>(16);
+public class WebSockSessionHolder {
+    private final Map<String, WebSocketSession> store = new ConcurrentHashMap<>(16);
 
     public void add(WebSocketSession session) {
-        sessions.put(session.getId(), session);
+        store.put(session.getId(), session);
     }
 
     public void remove(WebSocketSession session) {
-        sessions.remove(session.getId());
+        store.remove(session.getId());
     }
 }
