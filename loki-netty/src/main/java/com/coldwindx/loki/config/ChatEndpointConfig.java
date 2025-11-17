@@ -62,7 +62,8 @@ public class ChatEndpointConfig {
         public Mono<HandlerResult> handle(ServerWebExchange exchange, Object handler) {
             ServerHttpRequest request = exchange.getRequest();
             MultiValueMap<String, String> params = request.getQueryParams();
-            log.info("params: {}", params);
+            String logid = exchange.getAttribute("LOG_ID");
+            log.info("log id is {}", logid);
 
             WebSocketHandler webSocketHandler = (WebSocketHandler)handler;
             return this.getWebSocketService().handleRequest(exchange, webSocketHandler).then(Mono.empty());
