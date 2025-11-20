@@ -1,0 +1,4 @@
+"name","operation","key","value"
+"test","put","key1","com.coldwindx.loki.models.ConcurrentMapProxyTest$Package@add0edd"
+"test","put","key2","com.coldwindx.loki.models.ConcurrentMapProxyTest$Package@2aa3cd93"
+"test","remove","key1","com.coldwindx.loki.models.ConcurrentMapProxyTest$Package@add0edd"
