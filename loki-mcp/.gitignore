@@ -31,4 +31,3 @@ build/
 
 ### VS Code ###
 .vscode/
-loki-http/src/main/resources/application.yml

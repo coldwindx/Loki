@@ -8,11 +8,13 @@
 		<version>3.5.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
+
 	<groupId>com.coldwindx</groupId>
 	<artifactId>Loki</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>Loki</name>
 	<description>Loki</description>
+
 	<properties>
 		<java.version>21</java.version>
 	</properties>
