@@ -1,5 +1,6 @@
-package com.coldwindx.loki.factory.config;
+package com.coldwindx.loki.config;
 
+import com.coldwindx.loki.scope.SharedScope;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.CustomScopeConfigurer;
 import org.springframework.context.annotation.Bean;

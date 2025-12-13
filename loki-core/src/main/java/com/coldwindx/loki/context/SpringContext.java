@@ -1,4 +1,4 @@
-package com.coldwindx.utils;
+package com.coldwindx.loki.context;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;

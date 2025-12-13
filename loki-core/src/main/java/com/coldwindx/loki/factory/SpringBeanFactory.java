@@ -1,4 +1,4 @@
-package com.coldwindx.utils;
+package com.coldwindx.loki.factory;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +22,27 @@ public class SpringBeanFactory implements ApplicationContextAware {
         context = (ConfigurableApplicationContext) applicationContext;
     }
 
+    /// ===== 添加bean方法：用于在bean容器管理中添加bean实例 =====
+    public static void registerSingleton(String name, Object bean) {
+        ConfigurableBeanFactory factory = context.getBeanFactory();
+        if(!(factory instanceof DefaultListableBeanFactory defaultListableBeanFactory))
+            return;
+        // step1 注册bean实例
+        if(!defaultListableBeanFactory.containsSingleton(name))
+            defaultListableBeanFactory.registerSingleton(name, bean);
+    }
+
+    public static <T> void registerSingleton(T bean) {
+        ConfigurableBeanFactory factory = context.getBeanFactory();
+        if(!(factory instanceof DefaultListableBeanFactory defaultListableBeanFactory))
+            return;
+        // step1 注册bean实例
+        String name = bean.getClass().getName();
+        if(!defaultListableBeanFactory.containsSingleton(name))
+            defaultListableBeanFactory.registerSingleton(name, bean);
+    }
+
+    /// ===== 移除bean方法：用于从bean容器管理中移除bean实例 =====
     public static void removeSingleton(Class<?> clazz) {
         String name = clazz.getName();
         ConfigurableBeanFactory factory = context.getBeanFactory();
@@ -40,4 +61,5 @@ public class SpringBeanFactory implements ApplicationContextAware {
         if(defaultListableBeanFactory.containsSingleton(name))
             defaultListableBeanFactory.destroySingleton(name);
     }
+
 }

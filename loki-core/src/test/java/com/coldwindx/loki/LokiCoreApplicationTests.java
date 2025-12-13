@@ -1,13 +1,8 @@
 package com.coldwindx.loki;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
 
-@SpringBootTest
-class LokiCoreApplicationTests {
-
-    @Test
-    void contextLoads() {
-    }
-
-}
+@ComponentScan(basePackages = {"com.coldwindx.loki"})
+@SpringBootTest(classes = LokiCoreApplicationTests.class)
+public class LokiCoreApplicationTests {}
