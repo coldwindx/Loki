@@ -10,6 +10,10 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
+/**
+ * 手动创建&消耗bean
+ * ps: 每次创建时，可以触发@PostConstruct，但销毁时无法触发@PreDestroy
+ */
 @Component
 public class SpringBeanFactory implements ApplicationContextAware {
     @Getter

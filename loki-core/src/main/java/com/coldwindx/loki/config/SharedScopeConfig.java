@@ -11,6 +11,7 @@ import java.util.Collections;
 @Slf4j
 @Configuration
 public class SharedScopeConfig {
+
     @Bean
     public CustomScopeConfigurer customScopeConfigurer(SharedScope scope) {
         CustomScopeConfigurer configurer = new CustomScopeConfigurer();

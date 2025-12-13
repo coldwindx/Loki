@@ -15,6 +15,10 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * 组共享bean具体实现，通过join加入组内，left离开组内；
+ * 当引用计数器归0时，自动销毁当前组的bean实例，同时触发@PreDestroy方法
+ */
 @Slf4j
 @Component
 public class SharedScope implements Scope {
@@ -28,8 +32,6 @@ public class SharedScope implements Scope {
     @NotNull
     @Override
     public Object get(@NotNull String name, @NotNull ObjectFactory<?> objectFactory) {
-//        log.info("Getting bean {}", name);
-
         String gid = SharedScopeContext.getSharedGroupId();
         String beanName = generateKey(name, gid);
 
@@ -44,7 +46,7 @@ public class SharedScope implements Scope {
 
     @Override
     public @Nullable Object remove(@NotNull String name) {
-        log.info("Removing bean {}", name);
+        log.debug("Removing bean {}", name);
         String gid = SharedScopeContext.getSharedGroupId();
         String beanName = generateKey(name, gid);
         counts.remove(beanName);
@@ -53,7 +55,7 @@ public class SharedScope implements Scope {
 
     @Override
     public void registerDestructionCallback(@NotNull String name, @NotNull Runnable callback) {
-        log.info("Registering destruction callback {}", name);
+        log.debug("Registering destruction callback {}", name);
         String gid = SharedScopeContext.getSharedGroupId();
         String beanName = generateKey(name, gid);
         destroys.put(beanName, callback);
@@ -61,13 +63,13 @@ public class SharedScope implements Scope {
 
     @Override
     public @Nullable Object resolveContextualObject(@NotNull String key) {
-        log.info("Resolving context for {}", key);
+        log.debug("Resolving context for {}", key);
         return Scope.super.resolveContextualObject(key);
     }
 
     @Override
     public @Nullable String getConversationId() {
-        log.info("Getting conversation id for {}", SharedScopeContext.getSharedGroupId());
+        log.debug("Getting conversation id for {}", SharedScopeContext.getSharedGroupId());
         return SharedScopeContext.getSharedGroupId();
     }
 
@@ -77,13 +79,13 @@ public class SharedScope implements Scope {
 
     /// ===== 自定义方法：用于外部管理生命周期 =====
     public void join(String name, String gid) {
-        log.info("Joining shared group {}", gid);
+        log.debug("Joining shared group {}", gid);
         String beanName = PREFIX + generateKey(name, gid);
         counts.computeIfAbsent(beanName, key -> new AtomicInteger(0)).incrementAndGet();
     }
 
     public void join(Class<?> clazz, String gid) {
-        log.info("Joining shared group {}", gid);
+        log.debug("Joining shared group {}", gid);
         String name = Introspector.decapitalize(clazz.getSimpleName());
         String beanName = PREFIX + generateKey(name, gid);
         counts.computeIfAbsent(beanName, key -> new AtomicInteger(0)).incrementAndGet();
@@ -92,9 +94,8 @@ public class SharedScope implements Scope {
     public void left(String name, String gid) {
         String beanName = PREFIX + generateKey(name, gid);
         AtomicInteger count = counts.get(beanName);
-        log.info("Lefting shared group {} and ref count {}", gid, count.get());
+        log.debug("Lefting shared group {} and ref count {}", gid, count.get());
         if(count.decrementAndGet() <= 0) {
-            log.info("Delete shared group {}", gid);
             beans.remove(beanName);
             counts.remove(beanName);
             destroys.remove(beanName).run();
