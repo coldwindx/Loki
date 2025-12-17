@@ -1,11 +1,9 @@
 package com.coldwindx.loki.models;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.opencsv.CSVWriter;
 import lombok.SneakyThrows;
 
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;

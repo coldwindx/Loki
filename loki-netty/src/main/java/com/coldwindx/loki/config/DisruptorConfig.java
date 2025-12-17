@@ -1,9 +1,8 @@
 package com.coldwindx.loki.config;
 
-import com.coldwindx.loki.mq.consumer.MessageEventConsumer;
 import com.coldwindx.loki.models.Message;
+import com.coldwindx.loki.mq.consumer.MessageEventConsumer;
 import com.lmax.disruptor.BlockingWaitStrategy;
-import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.EventHandlerGroup;
