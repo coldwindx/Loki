@@ -10,10 +10,12 @@ import org.springframework.beans.factory.config.Scope;
 import org.springframework.stereotype.Component;
 
 import java.beans.Introspector;
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 /**
  * 组共享bean具体实现，通过join加入组内，left离开组内；
@@ -21,17 +23,19 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Slf4j
 @Component
-public class SharedScope implements Scope {
+public class SharedScoper implements Scope {
 
     private static final String PREFIX = "scopedTarget.";
 
     private final Map<String, Object> beans = new ConcurrentHashMap<>(16);
-    private final Map<String, Runnable> destroys = new ConcurrentHashMap<>(16);
     private final Map<String, AtomicInteger> counts = new ConcurrentHashMap<>(16);
+    private final Map<String, Supplier<String>> groups = new ConcurrentHashMap<>(16);
+    private final Map<String, Runnable> destroys = new ConcurrentHashMap<>(16);
 
     @NotNull
     @Override
     public Object get(@NotNull String name, @NotNull ObjectFactory<?> objectFactory) {
+        log.debug("Getting bean {}", name);
         String gid = SharedScopeContext.getSharedGroupId();
         String beanName = generateKey(name, gid);
 
@@ -78,6 +82,10 @@ public class SharedScope implements Scope {
     }
 
     /// ===== 自定义方法：用于外部管理生命周期 =====
+    public void register(String name, Supplier<String> supplier) {
+        groups.put(name, supplier);
+    }
+
     public void join(String name, String gid) {
         log.debug("Joining shared group {}", gid);
         String beanName = PREFIX + generateKey(name, gid);

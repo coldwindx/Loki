@@ -4,7 +4,7 @@ import com.coldwindx.loki.LokiCoreApplicationTests;
 import com.coldwindx.loki.context.SharedScopeContext;
 import com.coldwindx.loki.models.User;
 import com.coldwindx.loki.models.UserService;
-import com.coldwindx.loki.scope.SharedScope;
+import com.coldwindx.loki.scope.SharedScoper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class ScopeTest {
     private UserService userService;
 
     @Autowired
-    private SharedScope scope;
+    private SharedScoper scope;
 
     @Test
     public void test() {

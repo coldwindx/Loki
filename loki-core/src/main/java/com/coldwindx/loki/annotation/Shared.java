@@ -15,4 +15,4 @@ import java.lang.annotation.*;
 @Documented
 @Scope(value = "shared", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Component
-public @interface SharedScoped {}
+public @interface Shared {}

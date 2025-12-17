@@ -1,6 +1,9 @@
 package com.coldwindx.loki.models;
 
-import com.coldwindx.loki.annotation.SharedScoped;
+import com.coldwindx.loki.annotation.Shared;
+import com.coldwindx.loki.annotation.SharedGroupMethod;
+import com.coldwindx.loki.context.SharedScopeContext;
+import com.coldwindx.loki.scope.SharedScoper;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.UUID;
 
 @Slf4j
-@SharedScoped
+@Shared
 public class UserService {
 
     private String uuid =  UUID.randomUUID().toString();
@@ -30,5 +33,10 @@ public class UserService {
     @PreDestroy
     public void destroy(){
         log.info("destroy: {}", uuid);
+    }
+
+    @SharedGroupMethod
+    public static String group(){
+        return SharedScopeContext.getSharedGroupId();
     }
 }
