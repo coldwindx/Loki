@@ -22,7 +22,6 @@
 		<module>loki-netty</module>
 		<module>loki-http</module>
 		<module>loki-mcp</module>
-		<module>loki-gateway</module>
 	</modules>
 
 	<properties>
