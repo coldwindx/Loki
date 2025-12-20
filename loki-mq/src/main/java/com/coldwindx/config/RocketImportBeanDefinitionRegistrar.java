@@ -83,6 +83,7 @@ public class RocketImportBeanDefinitionRegistrar implements ImportBeanDefinition
     }
 
     private String generateProviderKey(String beanClassName, RocketConfig rocketConfig){
-        return beanClassName + ":" + rocketConfig.cluster() + ":" + rocketConfig.topic() + ":" + rocketConfig.group();
+        String tags = String.join("|", rocketConfig.tags());
+        return beanClassName + ":" + rocketConfig.cluster() + ":" + rocketConfig.topic() + ":" + rocketConfig.group() + ":" + rocketConfig.cluster() + ":" + tags;
     }
 }

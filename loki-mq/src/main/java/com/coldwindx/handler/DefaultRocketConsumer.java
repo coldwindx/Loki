@@ -5,11 +5,13 @@ import com.coldwindx.annotation.RocketConsumer;
 import com.coldwindx.entity.Message;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 @Slf4j
 @RocketConsumer(value = {
@@ -18,11 +20,12 @@ import java.util.List;
 })
 public class DefaultRocketConsumer {
 
-    @Setter private String cluster;
-    @Setter private String topic;
-    @Setter private String group;
-    @Setter private String tags;
-    private List<?> consumers = new ArrayList<>(16);
+    @Getter @Setter private String cluster;
+    @Getter @Setter private String topic;
+    @Getter @Setter private String group;
+    @Getter @Setter private String tags;
+
+    private final List<Consumer<Message<?>>> consumers = new ArrayList<>(16);
 
     @PostConstruct
     public void init(){
@@ -34,7 +37,11 @@ public class DefaultRocketConsumer {
         log.info("DefaultRocketConsumer.destroy(cluster = {}, topic = {}, group = {})", cluster, topic, group);
     }
 
-    public <T> void recv(Message<T> message){
+    public void recv(Message<?> message){
+        consumers.forEach(consumer -> consumer.accept(message));
+    }
 
+    public void register(Consumer<Message<?>> consumer){
+        consumers.add(consumer);
     }
 }

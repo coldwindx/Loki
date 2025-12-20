@@ -2,6 +2,7 @@ package com.coldwindx.service;
 
 import com.coldwindx.annotation.RocketConfig;
 import com.coldwindx.entity.Message;
+import com.coldwindx.handler.DefaultRocketConsumer;
 import com.coldwindx.handler.DefaultRocketProvider;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -31,5 +32,15 @@ public class TestService implements ApplicationContextAware {
 
     public void send(Message<?> message){
         provider.send(message);
+    }
+
+    public void sendAndRecv(Message<String> message){
+        context.getBeansOfType(DefaultRocketConsumer.class).values().stream()
+                .findFirst().ifPresent(consumer -> consumer.recv(message));
+    }
+
+    @RocketConfig(topic = "topic_common_mq")
+    public void recv(Message<?> message){
+        log.info("TestService.recv(message = {})", message);
     }
 }

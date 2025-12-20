@@ -5,6 +5,7 @@ import com.coldwindx.annotation.RocketProvider;
 import com.coldwindx.entity.Message;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,9 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 })
 public class DefaultRocketProvider {
 
-    @Setter private String cluster;
-    @Setter private String topic;
-    @Setter private String group;
+    @Getter @Setter private String cluster;
+    @Getter @Setter private String topic;
+    @Getter @Setter private String group;
 
     @PostConstruct
     public void init(){
