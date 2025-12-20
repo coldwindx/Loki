@@ -1,6 +1,6 @@
 package com.coldwindx.service;
 
-import com.coldwindx.provider.DefaultRocketProvider;
+import com.coldwindx.handler.DefaultRocketProvider;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;

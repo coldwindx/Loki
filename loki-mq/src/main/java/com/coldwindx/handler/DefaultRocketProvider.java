@@ -1,7 +1,8 @@
-package com.coldwindx.provider;
+package com.coldwindx.handler;
 
 import com.coldwindx.annotation.RocketConfig;
 import com.coldwindx.annotation.RocketProvider;
+import com.coldwindx.entity.Message;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.Setter;
@@ -27,7 +28,8 @@ public class DefaultRocketProvider {
     public void destroy() {
         log.info("DefaultRocketProvider.destroy(cluster = {}, topic = {}, group = {})", cluster, topic, group);
     }
-    public void send(){
+
+    public void send(Message<?> message){
 
     }
 }

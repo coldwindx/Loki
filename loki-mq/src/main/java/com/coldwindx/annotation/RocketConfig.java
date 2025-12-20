@@ -10,4 +10,5 @@ public @interface RocketConfig {
     String cluster() default "";
     String topic();
     String group() default "";
+    String[] tags() default {};
 }
