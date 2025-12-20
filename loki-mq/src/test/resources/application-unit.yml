@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: loki-mq
+
+rocket:
+  scan:
+    package:
+      provider: com.coldwindx.provider
