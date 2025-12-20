@@ -22,7 +22,6 @@ import java.util.*;
 @Slf4j
 public class RocketImportBeanDefinitionRegistrar implements ImportBeanDefinitionRegistrar {
 
-//    private List<String> packages = List.of("com.coldwindx.provider");
     private final static String DEFAULT_PACKAGE = "com.coldwindx.provider";
 
     @Override
