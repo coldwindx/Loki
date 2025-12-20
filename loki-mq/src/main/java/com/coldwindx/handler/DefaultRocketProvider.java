@@ -30,6 +30,6 @@ public class DefaultRocketProvider {
     }
 
     public void send(Message<?> message){
-
+        log.info("DefaultRocketProvider.send(cluster = {}, topic = {}, group = {}, message = {})", cluster, topic, group, message);
     }
 }

@@ -1,5 +1,7 @@
 package com.coldwindx.service;
 
+import com.coldwindx.annotation.RocketConfig;
+import com.coldwindx.entity.Message;
 import com.coldwindx.handler.DefaultRocketProvider;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TestService implements ApplicationContextAware {
 
-//    @RocketProvider(topic = "topic_common_mq")
+    @RocketConfig(topic = "topic_common_mq")
     private DefaultRocketProvider provider;
     private ApplicationContext context;
 
@@ -25,5 +27,9 @@ public class TestService implements ApplicationContextAware {
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.context = applicationContext;
+    }
+
+    public void send(Message<?> message){
+        provider.send(message);
     }
 }

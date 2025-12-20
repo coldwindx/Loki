@@ -1,5 +1,6 @@
 package com.coldwindx;
 
+import com.coldwindx.entity.Message;
 import com.coldwindx.service.TestService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,6 @@ public class AbstractTest {
 
     @Test
     public void test() {
-        log.info("test");
+        testService.send(new Message<>("hello world"));
     }
 }
