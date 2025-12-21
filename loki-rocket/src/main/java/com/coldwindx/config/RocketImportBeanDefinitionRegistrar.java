@@ -47,7 +47,6 @@ public class RocketImportBeanDefinitionRegistrar implements ImportBeanDefinition
         scanner.addIncludeFilter(new AnnotationTypeFilter(RocketConsumer.class));
         scanner.addIncludeFilter(new AssignableTypeFilter(AbstractRocketProvider.class));
         scanner.addIncludeFilter(new AssignableTypeFilter(AbstractRocketConsumer.class));
-        ClassLoader classLoader = ClassUtils.getDefaultClassLoader();
 
         // 3. 开启扫描
         for(String path : packages){
@@ -55,7 +54,7 @@ public class RocketImportBeanDefinitionRegistrar implements ImportBeanDefinition
                 continue;
             for(BeanDefinition definition : scanner.findCandidateComponents(path)){
                 String beanClassName = definition.getBeanClassName();
-                Class<?> clazz = ClassUtils.resolveClassName(Objects.requireNonNull(beanClassName), classLoader);
+                Class<?> clazz = ClassUtils.resolveClassName(Objects.requireNonNull(beanClassName), ClassUtils.getDefaultClassLoader());
 
                 // 4.1 注册Rocket生产者
                 RocketProvider[] rocketProviderAnnotations = clazz.getAnnotationsByType(RocketProvider.class);

@@ -1,5 +1,6 @@
 package com.coldwindx.loki.endpoint;
 
+import com.coldwindx.loki.annotation.Endpoint;
 import com.coldwindx.loki.store.WebSockSessionHolder;
 import com.coldwindx.loki.store.WsSenderStore;
 import com.coldwindx.loki.utils.LogHelper;
@@ -7,7 +8,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
@@ -16,7 +17,8 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 @Slf4j
-@Component
+@Endpoint()
+@RequestMapping("/chat")
 public class ChatEndpoint implements WebSocketHandler {
 
     @Autowired
