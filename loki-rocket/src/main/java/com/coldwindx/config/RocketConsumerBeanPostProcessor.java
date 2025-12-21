@@ -2,7 +2,7 @@ package com.coldwindx.config;
 
 import com.coldwindx.annotation.RocketConfig;
 import com.coldwindx.entity.Message;
-import com.coldwindx.handler.DefaultRocketConsumer;
+import com.coldwindx.handler.AbstractRocketConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -19,6 +19,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Rocket消费方法的注入过程，通过在消费方法上添加@RocketConfig实现
+ */
 @Slf4j
 @Component
 public class RocketConsumerBeanPostProcessor implements BeanPostProcessor, ApplicationContextAware {
@@ -27,17 +30,17 @@ public class RocketConsumerBeanPostProcessor implements BeanPostProcessor, Appli
 
     @Override
     public @Nullable Object postProcessAfterInitialization(@NonNull Object bean, @NonNull String beanName) throws BeansException {
-        log.info("RocketConsumerBeanPostProcessor.postProcessAfterInitialization({})", beanName);
+        // 1. 获取当前bean的公开方法，检查是否存在@RocketConfig注解
         Method[] methods = bean.getClass().getDeclaredMethods();
         for (Method method : methods) {
             if(!method.isAnnotationPresent(RocketConfig.class))
                 continue;
 
             try {
+                // 2. 根据@RocketConfig注解的参数，从Spring bean容器管理中寻找对应的RocketConsumer
                 RocketConfig annotation = method.getAnnotation(RocketConfig.class);
-                Map<String, DefaultRocketConsumer> beansOfType = context.getBeansOfType(DefaultRocketConsumer.class);
-                for(Map.Entry<String, DefaultRocketConsumer> entry : beansOfType.entrySet()) {
-                    DefaultRocketConsumer consumer = entry.getValue();
+                Map<String, AbstractRocketConsumer> beansOfType = context.getBeansOfType(AbstractRocketConsumer.class);
+                for(AbstractRocketConsumer consumer : beansOfType.values()) {
 
                     if(!consumer.getCluster().equals(annotation.cluster()))
                         continue;
@@ -53,6 +56,7 @@ public class RocketConsumerBeanPostProcessor implements BeanPostProcessor, Appli
                             continue;
                     }
 
+                    // 3. 执行方法注册到对应消费者的处理列表里
                     method.setAccessible(true);
                     consumer.register((Message<?> message)-> {
                         try {

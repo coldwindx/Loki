@@ -9,7 +9,7 @@
         <version>0.0.1</version>
     </parent>
 
-    <artifactId>loki-mq</artifactId>
+    <artifactId>loki-rocket</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

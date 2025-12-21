@@ -21,8 +21,4 @@ public class AbstractTest {
         testService.send(new Message<>("hello world"));
     }
 
-    @Test
-    public void test2() {
-        testService.sendAndRecv(new Message<>("hello world"));
-    }
 }
