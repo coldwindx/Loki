@@ -62,8 +62,4 @@ public class RocketProviderBeanPostProcessor implements BeanPostProcessor, Appli
         this.context = applicationContext;
     }
 
-    private String generateRocketKey(String beanClassName, RocketConfig rocketConfig){
-        String tags = String.join("|", rocketConfig.tags());
-        return beanClassName + ":" + rocketConfig.cluster() + ":" + rocketConfig.topic() + ":" + rocketConfig.group() + ":" + rocketConfig.cluster() + ":" + tags;
-    }
 }

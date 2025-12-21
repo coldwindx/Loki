@@ -51,7 +51,7 @@ public class RocketConsumerBeanPostProcessor implements BeanPostProcessor, Appli
 
                     if(consumer.getTags() != null && !consumer.getTags().isEmpty()) {
                         List<String> tagsConsumer = Arrays.asList(consumer.getTags().split("\\|"));
-                        List<String> tagsAnnotation = Arrays.asList(annotation.tags());
+                        List<String> tagsAnnotation = Arrays.asList(annotation.tags().split("\\|"));
                         if (!CollectionUtils.containsAny(tagsConsumer, tagsAnnotation))
                             continue;
                     }

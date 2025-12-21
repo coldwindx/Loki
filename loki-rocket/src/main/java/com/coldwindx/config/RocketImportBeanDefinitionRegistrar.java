@@ -1,7 +1,6 @@
 package com.coldwindx.config;
 
 import com.coldwindx.annotation.EnableRocket;
-import com.coldwindx.annotation.RocketConfig;
 import com.coldwindx.annotation.RocketConsumer;
 import com.coldwindx.annotation.RocketProvider;
 import com.coldwindx.handler.AbstractRocketConsumer;
@@ -20,10 +19,7 @@ import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.MultiValueMap;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * /@EnableRocket 自动 package 扫描，用于 spring 自动注册全部 RocketProvider 和 RocketConsumer
@@ -62,32 +58,44 @@ public class RocketImportBeanDefinitionRegistrar implements ImportBeanDefinition
                 Class<?> clazz = ClassUtils.resolveClassName(Objects.requireNonNull(beanClassName), classLoader);
 
                 // 4.1 注册Rocket生产者
-                RocketProvider rocketProviderAnnotation = clazz.getAnnotation(RocketProvider.class);
-                if(rocketProviderAnnotation != null)
-                    registerBeanDefinition(registry, beanClassName, clazz, rocketProviderAnnotation.value());
+                RocketProvider[] rocketProviderAnnotations = clazz.getAnnotationsByType(RocketProvider.class);
+                Arrays.stream(rocketProviderAnnotations).forEach(annotation -> registerBeanDefinition(registry, beanClassName, clazz, annotation));
 
                 // 4.2 注册Rocket消费者
-                RocketConsumer rocketConsumerAnnotation = clazz.getAnnotation(RocketConsumer.class);
-                if(rocketConsumerAnnotation != null)
-                    registerBeanDefinition(registry, beanClassName, clazz, rocketConsumerAnnotation.value());
+                RocketConsumer[] rocketConsumerAnnotation = clazz.getAnnotationsByType(RocketConsumer.class);
+                Arrays.stream(rocketConsumerAnnotation).forEach(annotation -> registerBeanDefinition(registry, beanClassName, clazz, annotation));
             }
         }
     }
 
-    private void registerBeanDefinition(@NonNull BeanDefinitionRegistry registry, String beanClassName, Class<?> clazz, RocketConfig[] configs) {
-        for(RocketConfig config : configs){
-            BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(clazz);
-            builder.addPropertyValue("cluster", config.cluster());
-            builder.addPropertyValue("topic", config.topic());
-            builder.addPropertyValue("group", config.group());
+    private void registerBeanDefinition(@NonNull BeanDefinitionRegistry registry, String beanClassName, Class<?> clazz, RocketProvider config) {
+        BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(clazz);
+        builder.addPropertyValue("cluster", config.cluster());
+        builder.addPropertyValue("topic", config.topic());
+        builder.addPropertyValue("group", config.group());
 
-            BeanDefinition beanDefinition = builder.getBeanDefinition();
-            String name = generateRocketKey(beanClassName, config);
-            registry.registerBeanDefinition(name, beanDefinition);
-        }
+        BeanDefinition beanDefinition = builder.getBeanDefinition();
+        String name = generateRocketKey(beanClassName, config);
+        registry.registerBeanDefinition(name, beanDefinition);
     }
 
-    private String generateRocketKey(String beanClassName, RocketConfig rocketConfig){
+    private void registerBeanDefinition(@NonNull BeanDefinitionRegistry registry, String beanClassName, Class<?> clazz, RocketConsumer config) {
+        BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(clazz);
+        builder.addPropertyValue("cluster", config.cluster());
+        builder.addPropertyValue("topic", config.topic());
+        builder.addPropertyValue("group", config.group());
+
+        BeanDefinition beanDefinition = builder.getBeanDefinition();
+        String name = generateRocketKey(beanClassName, config);
+        registry.registerBeanDefinition(name, beanDefinition);
+    }
+
+
+    private String generateRocketKey(String beanClassName, RocketProvider rocketConfig){
+        return beanClassName + ":" + rocketConfig.cluster() + ":" + rocketConfig.topic() + ":" + rocketConfig.group() + ":" + rocketConfig.cluster();
+    }
+
+    private String generateRocketKey(String beanClassName, RocketConsumer rocketConfig){
         String tags = String.join("|", rocketConfig.tags());
         return beanClassName + ":" + rocketConfig.cluster() + ":" + rocketConfig.topic() + ":" + rocketConfig.group() + ":" + rocketConfig.cluster() + ":" + tags;
     }

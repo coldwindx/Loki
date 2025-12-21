@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TestService implements ApplicationContextAware {
 
-    @RocketConfig(topic = "topic_common_mq")
+    @RocketConfig(topic = "topic_common_mq2")
     private DefaultRocketProvider provider;
     private ApplicationContext context;
 
