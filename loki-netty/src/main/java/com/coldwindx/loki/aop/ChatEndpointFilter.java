@@ -11,6 +11,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Component
 public class ChatEndpointFilter implements WebFilter {
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         HttpHeaders headers = exchange.getRequest().getHeaders();
@@ -19,4 +20,5 @@ public class ChatEndpointFilter implements WebFilter {
         exchange.getAttributes().put("LOG_ID", logid);
         return chain.filter(exchange).contextWrite(ctx -> ctx.put("LOG_ID", logid));
     }
+
 }
