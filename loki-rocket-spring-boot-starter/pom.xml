@@ -9,7 +9,7 @@
         <version>0.0.1</version>
     </parent>
 
-    <artifactId>loki-rocket</artifactId>
+    <artifactId>loki-rocket-spring-boot-starter</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
