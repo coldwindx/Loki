@@ -2,7 +2,6 @@ package com.coldwindx.loki.annotation;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.stereotype.Component;
 
 import java.lang.annotation.*;
 
@@ -14,5 +13,4 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Scope(value = "shared", proxyMode = ScopedProxyMode.TARGET_CLASS)
-@Component
 public @interface Shared {}

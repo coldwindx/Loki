@@ -3,14 +3,9 @@ package com.coldwindx.loki.context;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.*;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
 
 @Component
 public class SpringContext implements ApplicationContextAware, EnvironmentAware {
@@ -54,21 +49,4 @@ public class SpringContext implements ApplicationContextAware, EnvironmentAware 
         context.publishEvent(event);
     }
 
-    public static Object register(String beanName, Class<?> beanClass, Object... args) {
-        if(context.containsBean(beanName)) {
-            Object bean = context.getBean(beanName);
-            if(bean.getClass().isAssignableFrom(beanClass))
-                return bean;
-            throw new IllegalStateException("bean already exists: " + beanName);
-        }
-
-        BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(beanClass);
-        Arrays.stream(args).forEach(builder::addConstructorArgValue);
-        BeanDefinition definition = builder.getRawBeanDefinition();
-
-        ConfigurableApplicationContext configurableContext = (ConfigurableApplicationContext) context;
-        BeanDefinitionRegistry registry = (BeanDefinitionRegistry) configurableContext.getBeanFactory();
-        registry.registerBeanDefinition(beanName, definition);
-        return context.getBean(beanName);
-    }
 }

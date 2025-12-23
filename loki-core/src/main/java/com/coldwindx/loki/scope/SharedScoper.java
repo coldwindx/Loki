@@ -5,63 +5,102 @@ import com.coldwindx.loki.factory.SpringBeanFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.Scope;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import java.beans.Introspector;
-import java.util.Map;
-import java.util.Optional;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 
 /**
  * 组共享bean具体实现，通过join加入组内，left离开组内；
  * 当引用计数器归0时，自动销毁当前组的bean实例，同时触发@PreDestroy方法
  */
 @Slf4j
-@Component
-public class SharedScoper implements Scope {
+public class SharedScoper implements Scope, ApplicationContextAware {
 
     private static final String PREFIX = "scopedTarget.";
 
+    private ApplicationContext context;
     private final Map<String, Object> beans = new ConcurrentHashMap<>(16);
     private final Map<String, AtomicInteger> counts = new ConcurrentHashMap<>(16);
-    private final Map<String, Supplier<String>> groups = new ConcurrentHashMap<>(16);
     private final Map<String, Runnable> destroys = new ConcurrentHashMap<>(16);
+
 
     @NotNull
     @Override
     public Object get(@NotNull String name, @NotNull ObjectFactory<?> objectFactory) {
-        log.debug("Getting bean {}", name);
-        String gid = SharedScopeContext.getSharedGroupId();
-        String beanName = generateKey(name, gid);
+        // 从spring bean definition中获取bean definition
+        BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context;
+        BeanDefinition beanDefinition = registry.getBeanDefinition(name);
 
-        Optional.ofNullable(gid).orElseThrow(() -> new IllegalStateException("No shared group ID bound to current thread"));
-        return beans.computeIfAbsent(beanName, key -> {
+        Method sharedByMethod = (Method) beanDefinition.getAttribute("__sharedByMethod__");
+        if (sharedByMethod == null)
+            throw new IllegalStateException("No @SharedBy method found for bean " + name);
+
+        try {
+            String gid = (String) sharedByMethod.invoke(null);
+            String beanName = generateKey(name, gid);
+
+            return beans.computeIfAbsent(beanName, key -> {
                 counts.putIfAbsent(beanName, new AtomicInteger(1));
                 Object bean = objectFactory.getObject();
                 SpringBeanFactory.registerSingleton(beanName, bean);
                 return bean;
-        });
+            });
+
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException("Error invoking @SharedBy method for bean " + name);
+        }
     }
 
     @Override
     public @Nullable Object remove(@NotNull String name) {
-        log.debug("Removing bean {}", name);
-        String gid = SharedScopeContext.getSharedGroupId();
-        String beanName = generateKey(name, gid);
-        counts.remove(beanName);
-        return beans.remove(beanName);
+        // 从spring bean definition中获取bean definition
+        BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context;
+        BeanDefinition beanDefinition = registry.getBeanDefinition(name);
+
+        Method sharedByMethod = (Method) beanDefinition.getAttribute("__sharedByMethod__");
+        if (sharedByMethod == null)
+            throw new IllegalStateException("No @SharedBy method found for bean " + name);
+
+        try {
+            String gid = (String) sharedByMethod.invoke(null);
+            String beanName = generateKey(name, gid);
+            counts.remove(beanName);
+            return beans.remove(beanName);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException("Error invoking @SharedBy method for bean " + name);
+        }
     }
 
     @Override
     public void registerDestructionCallback(@NotNull String name, @NotNull Runnable callback) {
-        log.debug("Registering destruction callback {}", name);
-        String gid = SharedScopeContext.getSharedGroupId();
-        String beanName = generateKey(name, gid);
-        destroys.put(beanName, callback);
+        BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context;
+        BeanDefinition beanDefinition = registry.getBeanDefinition(name);
+
+        Method sharedByMethod = (Method) beanDefinition.getAttribute("__sharedByMethod__");
+        if (sharedByMethod == null)
+            throw new IllegalStateException("No @SharedBy method found for bean " + name);
+
+        try {
+            String gid = (String) sharedByMethod.invoke(null);
+            String beanName = generateKey(name, gid);
+            destroys.put(beanName, callback);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException("Error invoking @SharedBy method for bean " + name);
+        }
     }
 
     @Override
@@ -80,11 +119,6 @@ public class SharedScoper implements Scope {
         return name + ":" + gid;
     }
 
-    /// ===== 自定义方法：用于外部管理生命周期 =====
-    public void register(String name, Supplier<String> supplier) {
-        groups.put(name, supplier);
-    }
-
     public void join(String name, String gid) {
         log.debug("Joining shared group {}", gid);
         String beanName = PREFIX + generateKey(name, gid);
@@ -92,10 +126,28 @@ public class SharedScoper implements Scope {
     }
 
     public void join(Class<?> clazz, String gid) {
-        log.debug("Joining shared group {}", gid);
         String name = Introspector.decapitalize(clazz.getSimpleName());
         String beanName = PREFIX + generateKey(name, gid);
         counts.computeIfAbsent(beanName, key -> new AtomicInteger(0)).incrementAndGet();
+    }
+
+    public void join(Class<?> clazz) {
+        String name = Introspector.decapitalize(clazz.getSimpleName());
+        BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context;
+        BeanDefinition beanDefinition = registry.getBeanDefinition(PREFIX + name);
+
+        Method sharedByMethod = (Method) beanDefinition.getAttribute("__sharedByMethod__");
+        if (sharedByMethod == null)
+            throw new IllegalStateException("No @SharedBy method found for bean " + name);
+
+        try {
+            String gid = (String) sharedByMethod.invoke(null);
+            String beanName = PREFIX + generateKey(name, gid);
+            counts.computeIfAbsent(beanName, key -> new AtomicInteger(0)).incrementAndGet();
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException("Error invoking @SharedBy method for bean " + name);
+        }
     }
 
     public void left(String name, String gid) {
@@ -125,10 +177,40 @@ public class SharedScoper implements Scope {
         }
     }
 
+    public void left(Class<?> clazz) {
+        String name = Introspector.decapitalize(clazz.getSimpleName());
+        BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context;
+        BeanDefinition beanDefinition = registry.getBeanDefinition(PREFIX + name);
+
+        Method sharedByMethod = (Method) beanDefinition.getAttribute("__sharedByMethod__");
+        if (sharedByMethod == null)
+            throw new IllegalStateException("No @SharedBy method found for bean " + name);
+
+        try {
+            String gid = (String) sharedByMethod.invoke(null);
+            String beanName = PREFIX + generateKey(name, gid);
+            AtomicInteger count = counts.get(beanName);
+            if(0 < count.decrementAndGet()) return;
+
+            beans.remove(beanName);
+            counts.remove(beanName);
+            destroys.remove(beanName).run();
+            SpringBeanFactory.removeSingleton(beanName);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException("Error invoking @SharedBy method for bean " + name);
+        }
+    }
+
     // 👇 新增：用于测试的只读查询方法
     public boolean contains(Class<?> clazz, String gid) {
         String name = Introspector.decapitalize(clazz.getSimpleName());
         String beanName = PREFIX + generateKey(name, gid);
         return beans.containsKey(beanName);
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.context = applicationContext;
     }
 }
