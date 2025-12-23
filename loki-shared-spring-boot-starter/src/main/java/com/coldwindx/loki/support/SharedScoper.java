@@ -118,7 +118,7 @@ public class SharedScoper implements Scope, ApplicationContextAware {
         counts.computeIfAbsent(beanName, key -> new AtomicInteger(0)).incrementAndGet();
     }
 
-    public void left(Class<?> clazz) {
+    public void leave(Class<?> clazz) {
         String name = Introspector.decapitalize(clazz.getSimpleName());
         BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context;
         BeanDefinition beanDefinition = registry.getBeanDefinition(PREFIX + name);
