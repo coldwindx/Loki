@@ -2,7 +2,10 @@ package com.coldwindx.loki.support;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class SharedScopeThreadLocal {
     private static final ThreadLocal<SharedScopeAdapter> SHARED_SCOPE_THREAD_LOCAL = ThreadLocal.withInitial(SharedScopeAdapter::new);

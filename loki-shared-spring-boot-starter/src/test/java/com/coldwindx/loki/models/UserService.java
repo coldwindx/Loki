@@ -1,7 +1,6 @@
 package com.coldwindx.loki.models;
 
 import com.coldwindx.loki.annotation.Shared;
-import com.coldwindx.loki.context.SharedScopeContext;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +32,4 @@ public class UserService {
         log.info("destroy: {}", uuid);
     }
 
-    public static String group(){
-        return SharedScopeContext.getSharedGroupId();
-    }
 }

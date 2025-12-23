@@ -17,7 +17,7 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>loki-core</module>
+		<module>loki-shared-spring-boot-starter</module>
 		<module>loki-service</module>
 		<module>loki-netty</module>
 		<module>loki-http</module>

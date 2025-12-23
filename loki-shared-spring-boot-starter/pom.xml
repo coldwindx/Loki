@@ -9,7 +9,7 @@
         <version>0.0.1</version>
     </parent>
 
-    <artifactId>loki-core</artifactId>
+    <artifactId>loki-shared-spring-boot-starter</artifactId>
     <version>0.0.1</version>
     <name>loki-core</name>
     <description>loki-core</description>
