@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.UUID;
 
 @Slf4j
-@Shared
+@Shared(scope = "userService")
 public class UserService {
 
     private String uuid =  UUID.randomUUID().toString();

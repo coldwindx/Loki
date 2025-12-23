@@ -1,4 +1,5 @@
-spring.application.name: loki-code-te
+spring.application.name: loki-core-test
+
 logging:
   level:
     root: debug

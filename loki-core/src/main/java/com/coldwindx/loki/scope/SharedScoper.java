@@ -12,6 +12,7 @@ import org.springframework.beans.factory.config.Scope;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
 import java.beans.Introspector;
 import java.lang.reflect.InvocationTargetException;
@@ -25,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 当引用计数器归0时，自动销毁当前组的bean实例，同时触发@PreDestroy方法
  */
 @Slf4j
+@Component
 public class SharedScoper implements Scope, ApplicationContextAware {
 
     private static final String PREFIX = "scopedTarget.";

@@ -13,9 +13,9 @@ import java.util.Collections;
 public class SharedScopeConfig {
 
     @Bean
-    public CustomScopeConfigurer customScopeConfigurer() {
+    public CustomScopeConfigurer customScopeConfigurer(SharedScoper scope) {
         CustomScopeConfigurer configurer = new CustomScopeConfigurer();
-        configurer.setScopes(Collections.singletonMap("shared", new SharedScoper()));
+        configurer.setScopes(Collections.singletonMap("shared", scope));
         return configurer;
     }
 }
