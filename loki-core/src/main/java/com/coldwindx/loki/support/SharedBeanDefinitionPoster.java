@@ -12,8 +12,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 
-import java.util.Objects;
-
 @Slf4j
 @Component
 public class SharedBeanDefinitionPoster implements BeanDefinitionRegistryPostProcessor {
@@ -23,13 +21,17 @@ public class SharedBeanDefinitionPoster implements BeanDefinitionRegistryPostPro
         String[] beanDefinitionNames = registry.getBeanDefinitionNames();
         for (String beanDefinitionName : beanDefinitionNames) {
             BeanDefinition beanDefinition = registry.getBeanDefinition(beanDefinitionName);
-            String beanClassName = Objects.requireNonNull(beanDefinition.getBeanClassName());
+            String beanClassName = beanDefinition.getBeanClassName();
+            if(beanClassName == null) continue;
 
             Class<?> beanClass = ClassUtils.resolveClassName(beanClassName, ClassUtils.getDefaultClassLoader());
             Shared sharedAnnotation = beanClass.getAnnotation(Shared.class);
             if(sharedAnnotation == null) continue;
 
+            String scope = sharedAnnotation.scope();
+
             ((AbstractBeanDefinition) beanDefinition).setAbstract(true);
+            beanDefinition.setAttribute("__sharedScope__", scope);
         }
     }
 }

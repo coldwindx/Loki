@@ -66,11 +66,11 @@ public class ScopeTest extends LokiCoreTest {
         String u1 = withSharedGroup(gid, userService::id);
 
         // 第一个 session 离开 → 不应销毁
-        scope.left(UserService.class, gid);
+        scope.left(UserService.class);
         Assert.assertTrue(scope.contains(UserService.class, gid));
 
         // 第二个 session 离开 → 应销毁
-        scope.left(UserService.class, gid);
+        scope.left(UserService.class);
 
         // 等待可能的异步销毁（如果是同步实现则无需等待）
         Thread.sleep(100);
@@ -78,10 +78,10 @@ public class ScopeTest extends LokiCoreTest {
 
         // 再次访问应创建新实例（可选验证）
         log.info(">>>>");
-        scope.join(UserService.class, gid);
+        scope.join(UserService.class);
         String newBeanId = withSharedGroup(gid, userService::id);
         Assert.assertNotEquals(newBeanId, u1);
-        scope.left(UserService.class, gid);
+        scope.left(UserService.class);
     }
 
 }

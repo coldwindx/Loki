@@ -2,6 +2,7 @@ package com.coldwindx.loki.scope;
 
 import com.coldwindx.loki.context.SharedScopeContext;
 import com.coldwindx.loki.factory.SpringBeanFactory;
+import com.coldwindx.loki.support.SharedScopeThreadLocal;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
@@ -121,62 +122,20 @@ public class SharedScoper implements Scope, ApplicationContextAware {
         return name + ":" + gid;
     }
 
-    public void join(String name, String gid) {
-        log.debug("Joining shared group {}", gid);
-        String beanName = PREFIX + generateKey(name, gid);
-        counts.computeIfAbsent(beanName, key -> new AtomicInteger(0)).incrementAndGet();
-    }
-
-    public void join(Class<?> clazz, String gid) {
-        String name = Introspector.decapitalize(clazz.getSimpleName());
-        String beanName = PREFIX + generateKey(name, gid);
-        counts.computeIfAbsent(beanName, key -> new AtomicInteger(0)).incrementAndGet();
-    }
-
     public void join(Class<?> clazz) {
         String name = Introspector.decapitalize(clazz.getSimpleName());
         BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context;
         BeanDefinition beanDefinition = registry.getBeanDefinition(PREFIX + name);
 
-        Method sharedByMethod = (Method) beanDefinition.getAttribute("__sharedByMethod__");
-        if (sharedByMethod == null)
-            throw new IllegalStateException("No @SharedBy method found for bean " + name);
+        String scope = (String) beanDefinition.getAttribute("__sharedScope__");
+        if (scope == null || scope.isEmpty())
+            throw new IllegalStateException("No shared scope found for bean " + name);
+        if(!SharedScopeThreadLocal.containsKey(scope))
+            throw new IllegalStateException("No shared scope found for bean " + name);
 
-        try {
-            String gid = (String) sharedByMethod.invoke(null);
-            String beanName = PREFIX + generateKey(name, gid);
-            counts.computeIfAbsent(beanName, key -> new AtomicInteger(0)).incrementAndGet();
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException("Error invoking @SharedBy method for bean " + name);
-        }
-    }
-
-    public void left(String name, String gid) {
+        String gid = (String) SharedScopeThreadLocal.get(scope);
         String beanName = PREFIX + generateKey(name, gid);
-        AtomicInteger count = counts.get(beanName);
-        log.debug("Lefting shared group {} and ref count {}", gid, count.get());
-        if(count.decrementAndGet() <= 0) {
-            beans.remove(beanName);
-            counts.remove(beanName);
-            destroys.remove(beanName).run();
-            SpringBeanFactory.removeSingleton(beanName);
-        }
-    }
-
-
-    public void left(Class<?> clazz, String gid) {
-        String name = Introspector.decapitalize(clazz.getSimpleName());
-        String beanName = PREFIX + generateKey(name, gid);
-        AtomicInteger count = counts.get(beanName);
-        log.info("Lefting shared group {} and ref count {}", gid, count.get());
-        if(count.decrementAndGet() <= 0) {
-            log.info("Delete shared group {}", gid);
-            beans.remove(beanName);
-            counts.remove(beanName);
-            destroys.remove(beanName).run();
-            SpringBeanFactory.removeSingleton(beanName);
-        }
+        counts.computeIfAbsent(beanName, key -> new AtomicInteger(0)).incrementAndGet();
     }
 
     public void left(Class<?> clazz) {
@@ -184,24 +143,22 @@ public class SharedScoper implements Scope, ApplicationContextAware {
         BeanDefinitionRegistry registry = (BeanDefinitionRegistry) context;
         BeanDefinition beanDefinition = registry.getBeanDefinition(PREFIX + name);
 
-        Method sharedByMethod = (Method) beanDefinition.getAttribute("__sharedByMethod__");
-        if (sharedByMethod == null)
-            throw new IllegalStateException("No @SharedBy method found for bean " + name);
+        String scope = (String) beanDefinition.getAttribute("__sharedScope__");
+        if (scope == null || scope.isEmpty())
+            throw new IllegalStateException("No shared scope found for bean " + name);
+        if(!SharedScopeThreadLocal.containsKey(scope))
+            throw new IllegalStateException("No shared scope found for bean " + name);
 
-        try {
-            String gid = (String) sharedByMethod.invoke(null);
-            String beanName = PREFIX + generateKey(name, gid);
-            AtomicInteger count = counts.get(beanName);
-            if(0 < count.decrementAndGet()) return;
+        String gid = (String) SharedScopeThreadLocal.get(scope);
+        String beanName = PREFIX + generateKey(name, gid);
 
-            beans.remove(beanName);
-            counts.remove(beanName);
-            destroys.remove(beanName).run();
-            SpringBeanFactory.removeSingleton(beanName);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException("Error invoking @SharedBy method for bean " + name);
-        }
+        AtomicInteger count = counts.get(beanName);
+        if(0 < count.decrementAndGet()) return;
+
+        beans.remove(beanName);
+        counts.remove(beanName);
+        destroys.remove(beanName).run();
+        SpringBeanFactory.removeSingleton(beanName);
     }
 
     // 👇 新增：用于测试的只读查询方法

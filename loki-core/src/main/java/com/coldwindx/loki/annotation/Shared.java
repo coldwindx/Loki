@@ -14,12 +14,11 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Scope(value = "shared", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Component
 public @interface Shared {
     @AliasFor(annotation = Component.class, attribute = "value")
     String value() default "";
 
-    @AliasFor(annotation = Scope.class, attribute = "scopeName")
     String scope();
 }
