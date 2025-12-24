@@ -1,4 +1,4 @@
-package com.coldwindx.loki.support;
+package com.coldwindx.loki.handler;
 
 import com.coldwindx.loki.annotation.Endpoint;
 import org.springframework.beans.BeansException;
@@ -33,7 +33,7 @@ public class EndpointHandlerMapping extends SimpleUrlHandlerMapping implements A
                 throw new IllegalStateException("@Endpoint can only be used on a WebSocketHandler, bean: " + bean.getClass().getName());
 
             Endpoint annotation = AnnotationUtils.getAnnotation(bean.getClass(), Endpoint.class);
-            String path = Objects.requireNonNull(annotation).value();
+            String path = Objects.requireNonNull(annotation).path();
             handlerMap.put(path, (WebSocketHandler) bean);
         }
 

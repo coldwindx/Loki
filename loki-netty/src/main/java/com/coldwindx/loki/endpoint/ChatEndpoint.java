@@ -1,6 +1,5 @@
 package com.coldwindx.loki.endpoint;
 
-import com.coldwindx.loki.annotation.Endpoint;
 import com.coldwindx.loki.store.WebSockSessionHolder;
 import com.coldwindx.loki.store.WsSenderStore;
 import com.coldwindx.loki.utils.LogHelper;
@@ -17,7 +16,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 @Slf4j
-@Endpoint("/chat")
+//@Endpoint("/chat")
 @Component
 public class ChatEndpoint implements WebSocketHandler {
 
