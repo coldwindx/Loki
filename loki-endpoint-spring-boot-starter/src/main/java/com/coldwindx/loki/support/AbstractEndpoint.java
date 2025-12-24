@@ -10,7 +10,6 @@ import org.springframework.web.reactive.socket.WebSocketSession;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.SignalType;
 import reactor.core.publisher.SynchronousSink;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
@@ -18,13 +17,11 @@ import reactor.util.annotation.NonNull;
 
 public abstract class AbstractEndpoint implements WebSocketReceiver, WebSocketHandler {
 
-    Scheduler scheduler;
-
     @Override
     public @NonNull Mono<Void> handle(@NonNull WebSocketSession session) {
-        this.scheduler = Schedulers.newSingle("endpoint");
-
+        Scheduler scheduler = Schedulers.newSingle("endpoint");
         WebSocketSender sender = new UnicastWebSocketSender(session);
+
         Mono<Void> receive = session.receive().map(this::load).publishOn(scheduler).handle(this::onHandle).then();
         Mono<Void> send = session.send(sender.asFlux()).then();
 
@@ -33,7 +30,7 @@ public abstract class AbstractEndpoint implements WebSocketReceiver, WebSocketHa
         return Flux.zip(receive, send)
                 .doOnError(this::onError)
                 .doOnComplete(this::onComplete)
-                .doFinally(this::onFinally)
+                .doFinally(signal -> this.onFinally(scheduler))
                 .contextCapture().then();
     }
 
@@ -67,7 +64,7 @@ public abstract class AbstractEndpoint implements WebSocketReceiver, WebSocketHa
         }
     }
 
-    private void onFinally(SignalType signal) {
+    private void onFinally(Scheduler scheduler) {
         this.onClose();
         scheduler.dispose();
     }

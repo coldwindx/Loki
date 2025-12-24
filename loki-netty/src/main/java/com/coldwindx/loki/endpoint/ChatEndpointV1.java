@@ -25,6 +25,7 @@ public class ChatEndpointV1 extends AbstractEndpoint {
 
     @Override
     public void onMessage(String message) {
+        log.info("ChatEndpointV1 onMessage: {}", message);
         sender.send(message);
     }
 
