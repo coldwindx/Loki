@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>com.coldwindx</groupId>
-    <artifactId>loki-endpoint</artifactId>
+    <artifactId>loki-endpoint-spring-boot-starter</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
     <properties>
