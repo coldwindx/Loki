@@ -83,6 +83,7 @@ public class RocketImportBeanDefinitionRegistrar implements ImportBeanDefinition
         builder.addPropertyValue("cluster", config.cluster());
         builder.addPropertyValue("topic", config.topic());
         builder.addPropertyValue("group", config.group());
+        builder.addPropertyValue("tags", config.tags());
 
         BeanDefinition beanDefinition = builder.getBeanDefinition();
         String name = generateRocketKey(beanClassName, config);
