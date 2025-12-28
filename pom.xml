@@ -22,6 +22,7 @@
 		<module>loki-netty</module>
 		<module>loki-http</module>
 		<module>loki-mcp</module>
+		<module>loki-quartz</module>
 		<module>loki-rocket-spring-boot-starter</module>
 		<module>loki-endpoint-spring-boot-starter</module>
 	</modules>

@@ -1,8 +1,7 @@
 package com.coldwindx.controller;
 
+import com.coldwindx.loki.factory.SpringBeanFactory;
 import com.coldwindx.service.TimeService;
-import com.coldwindx.utils.SpringBeanFactory;
-import com.coldwindx.utils.SpringContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +24,6 @@ public class TimeController {
     @PostMapping(value = "remove")
     public void remove() {
         SpringBeanFactory.removeSingleton("timeService");
-        timeService = SpringContext.getBean("timeService", TimeService.class);
+//        timeService = SpringContext.getBean("timeService", TimeService.class);
     }
 }
