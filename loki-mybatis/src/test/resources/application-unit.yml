@@ -1,3 +1,10 @@
 spring:
   application:
     name: loki-mybatis
+  datasource:
+      username: root
+      password: mysql123
+      url: jdbc:mysql://10.37.2.220:3306/db_ngcc_video?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8
+      driver-class-name: com.mysql.cj.jdbc.Driver
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml

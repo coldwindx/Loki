@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.coldwindx.loki.mapper.TimeMapper">
+    <resultMap id="BaseResultMap" type="com.coldwindx.loki.entity.TimeBo">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="f_date" jdbcType="DATE" property="fDate"/>
+        <result column="f_datetime" jdbcType="TIMESTAMP" property="fDatetime"/>
+        <result column="f_time" jdbcType="TIME" property="fTime"/>
+        <result column="f_timestamp" jdbcType="TIMESTAMP" property="fTimestamp"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, f_date, f_datetime, f_time, f_timestamp
+    </sql>
+
+    <insert id="insert" parameterType="com.coldwindx.loki.entity.TimeBo">
+        insert into t_time
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fDate != null">f_date,</if>
+            <if test="fDatetime != null">f_datetime,</if>
+            <if test="fTime != null">f_time,</if>
+            <if test="fTimestamp != null">f_timestamp,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="fDate != null">#{fDate},</if>
+            <if test="fDatetime != null">#{fDatetime},</if>
+            <if test="fTime != null">#{fTime},</if>
+            <if test="fTimestamp != null">#{fTimestamp},</if>
+        </trim>
+    </insert>
+
+    <select id="select" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_time
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+</mapper>

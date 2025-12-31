@@ -1,6 +1,6 @@
-package com.bytedance.loki.support;
+package com.coldwindx.loki.support;
 
-import com.bytedance.loki.annotation.InterceptAnnotation;
+import com.coldwindx.loki.annotation.InterceptAnnotation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
@@ -56,9 +56,10 @@ public class MybatisEnvPlugin implements Interceptor {
         for (Method method : clazz.getDeclaredMethods()) {
             if (method.getName().equals(methodName)) {
                 InterceptAnnotation annotation = method.getAnnotation(InterceptAnnotation.class);
-                if (annotation != null) continue;
+                if (annotation == null) continue;
 
                 /// 分库分表等逻辑
+                System.out.println(sql);
             }
         }
         return sql;

@@ -1,4 +1,4 @@
-package com.bytedance.loki.annotation;
+package com.coldwindx.loki.annotation;
 
 import java.lang.annotation.*;
 
