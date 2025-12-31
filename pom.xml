@@ -23,6 +23,7 @@
 		<module>loki-http</module>
 		<module>loki-mcp</module>
 		<module>loki-quartz</module>
+		<module>loki-mybatis</module>
 		<module>loki-rocket-spring-boot-starter</module>
 		<module>loki-endpoint-spring-boot-starter</module>
 	</modules>
@@ -30,6 +31,16 @@
 	<properties>
 		<java.version>21</java.version>
 	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>${lombok.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
