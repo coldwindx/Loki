@@ -1,6 +1,7 @@
 package com.coldwindx.loki.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @AllArgsConstructor
 public enum TaskStatus{
@@ -9,6 +10,6 @@ public enum TaskStatus{
     SUCCESS(30, "成功"),
     FAIL(40, "失败")
     ;
-    final int code;
-    final String description;
+    @Getter final int code;
+    @Getter final String description;
 }

@@ -8,9 +8,10 @@ import java.util.Date;
 @Data
 @TableName("t_task_schedule")
 public class ScheduleTask {
-    private Integer id;
+    private Long id;
     private String topic;
     private String fingerprint;
+    private String clazz;
     private String args;
     private String result;
     private Integer status;
